@@ -813,152 +813,11 @@
 
     <script>
       let namaUser = "Ngab";
-      let merkHP = { jenis: "Unknown", merk: "Unknown", tipe: "Unknown" };
-      let namaHPLengkap = "HP mu";
 
       let cachedResult = null;
       let cachedCupu = null;
       let cachedAngry = null;
       let wheelSpun = false;
-
-      function deteksiHPAsli() {
-        const ua = navigator.userAgent;
-        let jenis = "Unknown";
-        let merk = "Unknown";
-        let tipe = "Unknown";
-
-        // Deteksi jenis dan merk
-        if (/iPhone/i.test(ua)) {
-          jenis = "iOS";
-          merk = "iPhone";
-          const iphoneMatch = ua.match(/iPhone OS ([\d_]+)/);
-          if (iphoneMatch) tipe = "iOS " + iphoneMatch[1].replace(/_/g, ".");
-        } else if (/iPad/i.test(ua)) {
-          jenis = "iOS";
-          merk = "iPad";
-          const ipadsMatch = ua.match(/OS ([\d_]+)/);
-          if (ipadsMatch) tipe = "iPadOS " + ipadsMatch[1].replace(/_/g, ".");
-        } else if (/Samsung/i.test(ua) || /SAMSUNG/i.test(ua)) {
-          jenis = "Android";
-          merk = "Samsung";
-          const modelMatch = ua.match(/SM-([A-Z])(\d{3})[A-Z]?/);
-          if (modelMatch) {
-            tipe = modelMatch[1] + modelMatch[2];
-          }
-        } else if (/Xiaomi/i.test(ua)) {
-          jenis = "Android";
-          merk = "Xiaomi";
-          const xiaomiMatch = ua.match(
-            /Mi\s*(?:Note\s*)?[A-Za-z0-9]+|Poco\s*[A-Za-z0-9]+/i,
-          );
-          if (xiaomiMatch) tipe = xiaomiMatch[0];
-        } else if (/Redmi/i.test(ua)) {
-          jenis = "Android";
-          merk = "Redmi";
-          const redmiMatch = ua.match(/Redmi\s*([^;]*)/i);
-          if (redmiMatch) tipe = redmiMatch[1].trim();
-        } else if (/POCO/i.test(ua)) {
-          jenis = "Android";
-          merk = "POCO";
-          const pocoMatch = ua.match(/POCO\s*([^;]*)/i);
-          if (pocoMatch) tipe = pocoMatch[1].trim();
-        } else if (/Oppo/i.test(ua) || /OPPO/i.test(ua)) {
-          jenis = "Android";
-          merk = "OPPO";
-          const oppoMatch = ua.match(/OPPO\s*([^;]*)/i);
-          if (oppoMatch) tipe = oppoMatch[1].trim();
-        } else if (/Vivo/i.test(ua) || /VIVO/i.test(ua)) {
-          jenis = "Android";
-          merk = "Vivo";
-          const vivoMatch = ua.match(/Vivo\s*([^;]*)/i);
-          if (vivoMatch) tipe = vivoMatch[1].trim();
-        } else if (/Realme/i.test(ua) || /realme/i.test(ua)) {
-          jenis = "Android";
-          merk = "Realme";
-          const realmeMatch = ua.match(/realme\s*([^;]*)/i);
-          if (realmeMatch) tipe = realmeMatch[1].trim();
-        } else if (/Infinix/i.test(ua)) {
-          jenis = "Android";
-          merk = "Infinix";
-          const infinixMatch = ua.match(/Infinix\s*([^;]*)/i);
-          if (infinixMatch) tipe = infinixMatch[1].trim();
-        } else if (/Asus/i.test(ua)) {
-          jenis = "Android";
-          merk = "ASUS";
-          const asusMatch = ua.match(/ASUS\s*([^;]*)/i);
-          if (asusMatch) tipe = asusMatch[1].trim();
-        } else if (/OnePlus/i.test(ua)) {
-          jenis = "Android";
-          merk = "OnePlus";
-          const oneplusMatch = ua.match(/OnePlus\s*([^;]*)/i);
-          if (oneplusMatch) tipe = oneplusMatch[1].trim();
-        } else if (/Pixel/i.test(ua) || /Google/i.test(ua)) {
-          jenis = "Android";
-          merk = "Google Pixel";
-          const pixelMatch = ua.match(/Pixel\s*([^;]*)/i);
-          if (pixelMatch) tipe = pixelMatch[1].trim();
-        } else if (/Motorola/i.test(ua)) {
-          jenis = "Android";
-          merk = "Motorola";
-          const motoMatch = ua.match(/Motorola\s*([^;]*)/i);
-          if (motoMatch) tipe = motoMatch[1].trim();
-        } else if (/Nokia/i.test(ua)) {
-          jenis = "Android";
-          merk = "Nokia";
-          const nokiaMatch = ua.match(/Nokia\s*([^;]*)/i);
-          if (nokiaMatch) tipe = nokiaMatch[1].trim();
-        } else if (/HTC/i.test(ua)) {
-          jenis = "Android";
-          merk = "HTC";
-          const htcMatch = ua.match(/HTC\s*([^;]*)/i);
-          if (htcMatch) tipe = htcMatch[1].trim();
-        } else if (/Huawei/i.test(ua) || /HUAWEI/i.test(ua)) {
-          jenis = "Android";
-          merk = "Huawei";
-          const huaweiMatch = ua.match(/Huawei\s*([^;]*)/i);
-          if (huaweiMatch) tipe = huaweiMatch[1].trim();
-        } else if (/Honor/i.test(ua)) {
-          jenis = "Android";
-          merk = "Honor";
-          const honorMatch = ua.match(/Honor\s*([^;]*)/i);
-          if (honorMatch) tipe = honorMatch[1].trim();
-        } else if (/Nothing/i.test(ua)) {
-          jenis = "Android";
-          merk = "Nothing";
-          const nothingMatch = ua.match(/Nothing\s*([^;]*)/i);
-          if (nothingMatch) tipe = nothingMatch[1].trim();
-        } else if (/Sony/i.test(ua)) {
-          jenis = "Android";
-          merk = "Sony";
-          const sonyMatch = ua.match(/Sony\s*([^;]*)/i);
-          if (sonyMatch) tipe = sonyMatch[1].trim();
-        } else if (/LG/i.test(ua)) {
-          jenis = "Android";
-          merk = "LG";
-          const lgMatch = ua.match(/LG\s*([^;]*)/i);
-          if (lgMatch) tipe = lgMatch[1].trim();
-        } else if (/Android/i.test(ua)) {
-          jenis = "Android";
-          merk = "Generic Android";
-          const androidMatch = ua.match(/Android\s+([\d.]+)/);
-          if (androidMatch) tipe = "Android " + androidMatch[1];
-        } else if (/Macintosh/i.test(ua)) {
-          jenis = "macOS";
-          merk = "MacBook";
-          const macMatch = ua.match(/Mac OS X ([\d_]+)/);
-          if (macMatch) tipe = "macOS " + macMatch[1].replace(/_/g, ".");
-        } else if (/Windows/i.test(ua)) {
-          jenis = "Windows";
-          merk = "Windows PC";
-          const winMatch = ua.match(/Windows NT ([\d.]+)/);
-          if (winMatch) tipe = "Windows NT " + winMatch[1];
-        }
-
-        return { jenis, merk, tipe };
-      }
-
-      merkHP = deteksiHPAsli();
-      namaHPLengkap = `${merkHP.jenis} ${merkHP.merk} ${merkHP.tipe}`.trim();
 
       const CUPU = [
         {
@@ -970,6 +829,16 @@
           title: "Anjir penakut amat lu bangsat 😭",
           line: "Link ginian doang ditakutin, ya pantes gapunya pacar sampe membusuk!",
           body: "Ini bukan link pinjol ilegal atau tagihan ukt kuliah lu nyet, gausah lebay. Atau jangan-jangan lu sebenernya emang udah tau spek lu tragis makanya takut ngadepin kenyataan? 👀",
+        },
+        {
+          title: "Penakut kelas dunia dah lu babi 😨",
+          line: "Malingan aja berani, colokan saja berani, link ginian takut. Logika sida!",
+          body: "Ini cuma web biasa buat ngebully lu, bukan virus atau malware. Tapi tau deh, mungkin subconscious lu udah merasa perlu perlindungan soalnya spek lu jelek banget ngentot.",
+        },
+        {
+          title: "Bacot deh lu busuk 💀",
+          line: "Takut segini mah seharusnya lu jadi pacar orang, bukannya jomblo!",
+          body: "Kalo buat yang penting aja berani, pasti udah dapat pacar. Ini aja takutan, ya sudahlah lu resign aja jadi jomblo seumur hidup. Nasib gitu.",
         },
       ];
 
@@ -992,7 +861,7 @@
           title: "STATUS: SINGLELELE KRONIS BIN AMPAS",
           desc: "Kasur kamar lu lebih tau penderitaan lu dibanding siapapun. Tiap malem cuma melongolin plafon meratapi nasib.",
           verdict: () =>
-            `<b>Doi udah boncengan, bahkan mungkin udah cipokan ama orang lain berbulan-bulan, lu masih aja nunggu "waktu yang tepat" di hp ${namaHPLengkap} lu yang butut itu. Nyari waktu yang tepat apaan bangsat, ${namaUser}??? Nunggu dunia kiamat???</b> 😭`,
+            `<b>Doi udah boncengan, bahkan mungkin udah cipokan ama orang lain berbulan-bulan, lu masih aja nunggu "waktu yang tepat" di dalem genggaman itu. Nyari waktu yang tepat apaan bangsat, ${namaUser}??? Nunggu dunia kiamat???</b> 😭`,
           stats: [
             { n: "12", l: "Video galau tiktok yang lu tonton semalem" },
             { n: "100%", l: "Kadar ke-badutan lu di depan umum" },
@@ -1005,12 +874,38 @@
           title: "REKOR JOMBLO LEGENDARIS PALING BANGSAT",
           desc: "Langka banget ada spek manusia purba yang bisa bertahan selama ini sendirian tanpa asupan kasih sayang.",
           verdict: () =>
-            `Faktanya: <b>Chat terakhir yang masuk ke WA lu tuh cuma dari grup kelas ato admin slot judi. Bukan dari manusia yang beneran sayang ama lu, babi. HP ${namaHPLengkap} lu sepi amat kayak kuburan massal, ${namaUser}.</b> 😂`,
+            `Faktanya: <b>Chat terakhir yang masuk ke WA lu tuh cuma dari grup kelas ato admin slot judi. Bukan dari manusia yang beneran sayang ama lu, babi. Kehidupan sosial lu sepi amat kayak kuburan massal, ${namaUser}.</b> 😂`,
           stats: [
             { n: "5x", l: "Lebih sering stalking dari pada dichat orang" },
             { n: "0", l: "Nyawa yang peduli lu masih idup apa kaga" },
             { n: "7", l: "Dukun yang gagal nyembuhin aura jomblo" },
             { n: "ZONK", l: "Hasil asmara lu tetep ampas ngentot" },
+          ],
+        },
+        {
+          emoji: "😱",
+          title: "HASIL: JOMBLO KRITIS MEMERLUKAN BANTUAN DARURAT",
+          desc: "Serius deh, perlu intervensi psikolog, dokter, dan paranormal sekaligus.",
+          verdict: () =>
+            `<b>Udah jelas banget sih ${namaUser}. Doi udah lanjut, lu masih di awal cerita. Malingnya aja lu lebih percaya diri dari ngomong \"halo\" ke gebetan. Ini bukan lagi masalah nasib, tapi mental health crisis!</b> 😩`,
+          stats: [
+            { n: "∞", l: "Umur jomblo lu kalo gini terusin" },
+            { n: "0", l: "Kepercayaan diri lu pas chat duluan" },
+            { n: "999x", l: "Lu stalking dibanding dichat orang" },
+            { n: "FAIL", l: "Percobaan ketemu doi dengan cara normal" },
+          ],
+        },
+        {
+          emoji: "🎭",
+          title: "DIAGNOSIS: JOMBLO AKIBAT FAKTOR GANDA NGENTOT",
+          desc: "Kombinasi spek jelek + mental down = resep jomblo abadi",
+          verdict: () =>
+            `<b>Mau sih honest assessment: ${namaUser}, lu bukan takdir jomblo karena nasib. Lu jomblo karena kombinasi sempurna dari pengecut + kurang percaya diri + spek tragis. Tapi hey, bareng itu lebih mudah dari yang lu pikir koq!</b> 💀`,
+          stats: [
+            { n: "3", l: "Faktor utama jomblo lu yang parah" },
+            { n: "0%", l: "Usaha nyapa orang yang lu suka" },
+            { n: "100", l: "Alasan yang lu temuin kenapa gapunya pacar" },
+            { n: "∞", l: "Waktu yang udah terbuang" },
           ],
         },
       ];
@@ -1020,13 +915,31 @@
           title: "Lah, ngapa jadi lu yang ngamuk babi???",
           line: "Bacot bener, jomblo akut masih sempet-sempetnya protes bangsat 💀",
           body: () =>
-            `Data sistem kagak pernah bohong ngab. Yang bohong tuh lu sendiri, ${namaUser}, yang tiap malem ngetik "wkwk gpp santai" di hp ${namaHPLengkap} lu padahal air mata lu ngalir deras babi. Terima aja nasib!`,
+            `Data sistem kagak pernah bohong ngab. Yang bohong tuh lu sendiri, ${namaUser}, yang tiap malem ngetik "wkwk gpp santai" ke temen padahal air mata lu ngalir deras babi. Terima aja nasib!`,
         },
         {
           title: "Serius lu mau ngajak ribut?",
           line: "Yaelah, spek rengginang masih aja ngeyel dibilangin wkwkwk",
           body: () =>
             `Oke lu kagak setuju, ${namaUser}. Tapi coba jawab jujur anjing: kapan terakhir kali ada lawan jenis yang chat lu duluan tanpa ada maunya? Sekali chat cuma minjem duit kan? Miris ngentot.`,
+        },
+        {
+          title: "Gapapa kalo lu marah, yang ketahuan tetep fakta 😏",
+          line: "Denial jangan sampe jadi kebiasaan, ntar ujian hidupnya makin berat loh!",
+          body: () =>
+            `${namaUser}, marah-marah itu gara-gara lu ngerasa ketipu sama hasil ini. Tapi kenyataannya? Ini bukannya hasilnya yang salah, tapi kenyataan yang lu udah lama abaikan. Mau marah ke siapa, ke gue? Gue cuma alat, faktor eksternal. Akarnya dari lu sendiri dek.`,
+        },
+        {
+          title: "Ohh jadi ini mau counter attack? 💀",
+          line: "Coba deh ubah mood dengan baca ulang hasilnya sambil nangis",
+          body: () =>
+            `Gampang aja sih marah. Tapi emang solusinya apa ${namaUser}? Serius? Mau protes ke creator? Atau mau buktiin result ini salah dengan cara... mulai chat orang yang lu suka? Nah, itu baru aksi nyata daripada sekadar marah!`,
+        },
+        {
+          title: "Wah emang udah masuk stadium defensif ya 😬",
+          line: "Ini tandanya result lu sangat accurate, makanya marah-marah wkwk",
+          body: () =>
+            `Orang yang benar-benar yakin dengan diri mereka gak bakal marah segini ${namaUser}. Tapi lu? Lu marah karena deep inside, lu tahu hasil ini tepat sasaran banget. Ego lu yang tersentuh. Dan ini adalah momen bagus untuk self-reflection, bukan untuk ngomel!`,
         },
       ];
 
@@ -1055,10 +968,10 @@
         },
         {
           emoji: "☠️",
-          label: "HP SEPI\n7 TURUNAN",
+          label: "SEPI\n7 TURUNAN",
           color: "#a855f7",
           result:
-            "☠️ KUTUKAN: HP sepi 7 turunan. Chat masuk cuma dari provider doang.",
+            "☠️ KUTUKAN: Hidup sepi 7 turunan. Chat masuk cuma dari provider doang.",
         },
         {
           emoji: "🤡",
@@ -1072,7 +985,7 @@
           label: "PAKET\nLENGKAP",
           color: "#e74c3c",
           result:
-            "💸 FINANSIAL: Udah jomblo, kere, kuota abis, hp retak. Paket lengkap nyet!",
+            "💸 FINANSIAL: Udah jomblo, kere, gado-gado semua. Paket lengkap nyet!",
         },
       ];
 
@@ -1248,7 +1161,7 @@
         const steps = ["s1", "s2", "s3", "s4"];
         const labels = [
           `Membaca data manifestasi teks buat ${namaUser}...`,
-          `Memproses file curhatan di internal ${namaHPLengkap}...`,
+          `Memproses file curhatan lu...`,
           `Menghitung total dosa ke-badutan lu...`,
           `Menyusun kalimat pembantaian mental...`,
         ];
