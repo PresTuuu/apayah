@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Penting banget baca ini</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #f2ede8;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.card {
+  background: #fff; border-radius: 20px;
+  max-width: 420px; width: 100%;
+  padding: 36px 32px;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+  position: relative; overflow: hidden;
+}
+.card::before {
+  content:''; position:absolute; top:0;left:0;right:0; height:4px;
+  background: linear-gradient(90deg,#ff6b6b,#ffa94d,#ff6b6b);
+  background-size:200%; animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer { from{background-position:0%} to{background-position:200%} }
+#step1,#step2,#step3,#stepAngry,#stepCupu,#stepWheel { display:none; }
+.tag {
+  display:inline-block; background:#fff3cd; color:#b45309;
+  font-size:12px; font-weight:700; padding:4px 10px; border-radius:6px;
+  letter-spacing:.5px; margin-bottom:20px; text-transform:uppercase;
+}
+h1 { font-size:24px; font-weight:800; color:#1a1a1a; line-height:1.35; margin-bottom:12px; }
+.sub { font-size:15px; color:#666; line-height:1.65; margin-bottom:28px; }
+.sub b { color:#1a1a1a; }
+
+/* Input Styling */
+.input-group { margin-bottom: 20px; text-align: left; }
+.input-group label { display: block; font-size: 13px; font-weight: 700; color: #555; margin-bottom: 8px; text-transform: uppercase; }
+.input-name {
+  width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 12px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600;
+  outline: none; transition: all 0.2s;
+}
+.input-name:focus { border-color: #1a1a1a; background: #fafafa; }
+
+.btn {
+  width:100%; padding:15px; border:none; border-radius:12px;
+  font-family:'Plus Jakarta Sans',sans-serif; font-size:16px; font-weight:700;
+  cursor:pointer; transition:all .15s ease;
+}
+.btn-primary { background:#1a1a1a; color:white; }
+.btn-primary:hover { background:#333; transform:translateY(-1px); }
+.btn-primary:active { transform:scale(.98); }
+.btn-ghost {
+  background:transparent; color:#bbb; font-size:14px;
+  margin-top:8px; padding:10px;
+  border:1.5px dashed #e0e0e0; border-radius:10px;
+}
+.btn-ghost:hover { color:#888; border-color:#ccc; }
+.btn-red { background:#e74c3c; color:white; margin-top:12px; }
+.btn-red:hover { background:#c0392b; }
+.btn-orange { background:#e67e22; color:white; }
+.btn-orange:hover { background:#ca6f1e; }
+.btn-purple { background:#8e44ad; color:white; margin-top:10px; }
+.btn-purple:hover { background:#7d3c98; }
+
+.progress-label { font-size:13px; color:#888; margin-bottom:10px; height:18px; font-weight: 600; }
+.progress-bar-bg { background:#f0f0f0; border-radius:50px; height:8px; overflow:hidden; margin-bottom:24px; }
+.progress-bar-fill { height:100%; background:#1a1a1a; border-radius:50px; width:0%; transition:width .5s ease; }
+.step-list { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.step-list li { display:flex; align-items:center; gap:12px; font-size:14px; color:#ccc; transition:color .3s; }
+.step-list li.done { color:#1a1a1a; font-weight:600; }
+.step-list li.active { color:#555; }
+.step-icon {
+  width:26px; height:26px; border-radius:50%; background:#f0f0f0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; flex-shrink:0; transition:all .3s;
+}
+.step-list li.done .step-icon { background:#1a1a1a; color:white; }
+.step-list li.active .step-icon { background:#ffa94d; color:white; animation:popIcon 1s ease-in-out infinite; }
+@keyframes popIcon { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+
+.result-big {
+  background:#fff5f5; border:1.5px solid #ffd0d0;
+  border-radius:14px; padding:22px 18px; margin:20px 0; text-align:center;
+}
+.result-emoji { font-size:52px; margin-bottom:10px; }
+.result-title { font-size:19px; font-weight:800; color:#c0392b; margin-bottom:6px; }
+.result-desc { font-size:14px; color:#888; line-height:1.6; }
+
+/* Perbaikan Tampilan Analisis Grid */
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px; }
+.stat-box { 
+  background:#f8f8f8; border-radius:12px; padding:16px 14px; 
+  display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+}
+.stat-box .num { font-size:22px; font-weight:800; color:#1a1a1a; margin-bottom: 4px; }
+.stat-box .lbl { 
+  font-size:11.5px; color:#666; line-height:1.5; 
+  text-align: justify; text-align-last: center; 
+}
+
+.verdict-box {
+  border-left:3px solid #ffa94d; padding:14px 16px;
+  background:#fffbf5; border-radius:0 10px 10px 0;
+  font-size:14px; color:#555; line-height:1.7; margin-bottom:24px;
+  text-align: justify;
+}
+.verdict-box b { color:#1a1a1a; }
+.big-emoji { font-size:64px; text-align:center; display:block; margin-bottom:16px; }
+.roast-line {
+  background:#fff0f0; border-radius:12px; padding:16px 18px;
+  font-size:15px; font-weight:700; color:#c0392b; line-height:1.6; margin-bottom:16px;
+}
+
+/* ===== Premium Spin Wheel ===== */
+.wheel-scene {
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 20px;
+}
+.wheel-outer-ring {
+  position: relative;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #ff6b6b, #ffa94d, #ffd43b, #69db7c, #4dabf7, #a855f7, #ff6b6b);
+  padding: 6px;
+  box-shadow: 0 0 30px rgba(255,107,107,0.35), 0 0 60px rgba(168,85,247,0.2), 0 8px 32px rgba(0,0,0,0.18);
+  animation: ringPulse 3s ease-in-out infinite;
+}
+@keyframes ringPulse {
+  0%,100% { box-shadow: 0 0 30px rgba(255,107,107,0.35), 0 0 60px rgba(168,85,247,0.2), 0 8px 32px rgba(0,0,0,0.18); }
+  50% { box-shadow: 0 0 45px rgba(255,107,107,0.55), 0 0 80px rgba(168,85,247,0.35), 0 8px 32px rgba(0,0,0,0.18); }
+}
+.wheel-inner {
+  width: 100%; height: 100%; border-radius: 50%; background: white;
+  position: relative; overflow: hidden;
+}
+#wheelCanvas { display: block; width: 100%; height: 100%; }
+.wheel-pointer-wrap {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%); z-index: 20;
+  display: flex; flex-direction: column; align-items: center;
+}
+.wheel-ptr-body {
+  width: 22px; height: 34px;
+  background: linear-gradient(180deg, #fff 0%, #e0e0e0 100%);
+  clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  filter: drop-shadow(0 2px 6px rgba(255,100,100,0.5));
+}
+.wheel-center-cap {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 52px; height: 52px; background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+  border: 4px solid rgba(0,0,0,0.12); border-radius: 50%; z-index: 15;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2), inset 0 1px 3px rgba(255,255,255,0.8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; line-height: 1;
+}
+
+.wheel-result {
+  background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+  border: 2px solid #ffd43b;
+  border-radius: 16px; padding: 18px 16px; font-weight: 700; font-size: 15px;
+  text-align: center; margin-bottom: 20px; display: none;
+  color: #7c4a00; line-height: 1.6;
+  box-shadow: 0 4px 20px rgba(255,180,0,0.2);
+  animation: resultPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.wheel-result-icon { font-size: 36px; display: block; margin-bottom: 8px; }
+.wheel-result-text { font-size: 14px; font-weight: 700; color: #7c4a00; }
+@keyframes resultPop {
+  from { opacity: 0; transform: scale(0.8) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.reveal { opacity:0; transform:translateY(14px); animation:rev .45s ease forwards; }
+@keyframes rev { to { opacity:1; transform:translateY(0); } }
+.d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.28s}
+.d4{animation-delay:.42s}.d5{animation-delay:.58s}.d6{animation-delay:.72s}
+.share-note { text-align:center; font-size:12px; color:#ccc; margin-top:10px; }
+
+/* ===== Toast Notification ===== */
+#toastEl {
+  position: fixed; bottom: 32px; left: 50%; 
+  transform: translateX(-50%) translateY(80px);
+  background: #1a1a1a; color: white;
+  padding: 14px 22px; border-radius: 14px;
+  font-size: 14px; font-weight: 700;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  z-index: 9999; max-width: 320px; width: max-content;
+  text-align: center; opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+#toastEl.toast-show {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+.toast-icon { font-size: 18px; margin-right: 6px; }
+
+/* ===== Count-up stat animation ===== */
+.stat-box .num { transition: none; }
+</style>
+</head>
+<body>
+
+<audio id="backsoundPrank" src="https://www.soundjay.com/buttons/sounds/button-10.mp3" preload="auto"></audio>
+
+<div class="card">
+
+  <div id="customAlert" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.98); z-index:100; align-items:center; justify-content:center; padding:32px; border-radius:20px;" class="reveal">
+    <div style="text-align:center;">
+      <span style="font-size:52px; display:block; margin-bottom:12px;">⚠️</span>
+      <h1 style="font-size:22px; color:#e74c3c; font-weight:800;">Isi Nama Lu, Babi!</h1>
+      <p class="sub" style="margin-bottom:24px;">Jangan dikosongin ato spasi doang anjing, sistem bingung mau nge-roast siapa nanti!</p>
+      <button class="btn btn-primary" onclick="tutupPopup()">Oke, Gue Isi 😭</button>
+    </div>
+  </div>
+
+  <div id="step1">
+    <div class="tag reveal">⚠️ Pesan Terenkripsi</div>
+    <h1 class="reveal d1">Ada surat masuk buat lu...</h1>
+    <p class="sub reveal d2">
+      Seseorang nitip surat penting di sistem kami. Dia sengaja ngirim lewat sini karena ga berani ngomong langsung ke muka lu.<br><br>
+      Ketik nama panggilan asli lu di bawah biar sistem beneran ngebuka file surat yang pas buat lu.
+    </p>
+    <div class="input-group reveal d3">
+      <label for="username">Nama Panggilan Lu :</label>
+      <input text="text" id="username" class="input-name" placeholder="Ketik nama asli lu..." autocomplete="off">
+    </div>
+    <button class="btn btn-primary reveal d4" onclick="validasiMulai()">Buka Surat Sekarang →</button>
+    <button class="btn btn-ghost reveal d5" onmouseover="lari(this)" onclick="cupu()">Ogah, takutan babi</button>
+  </div>
+
+  <div id="stepCupu">
+    <span class="big-emoji reveal">💀</span>
+    <h1 class="reveal d1" id="cupuTitle"></h1>
+    <div class="roast-line reveal d2" id="cupuLine"></div>
+    <p class="sub reveal d3" id="cupuBody"></p>
+    <button class="btn btn-orange reveal d4" onclick="mulai()">Iya deh bangsat gue buka 😭</button>
+  </div>
+
+  <div id="step2">
+    <div class="tag">📩 Mengunduh Pesan</div>
+    <h1 style="margin-bottom:20px" id="loaderTitle">Memproses dokumen rahasia...</h1>
+    <div class="progress-label" id="progLabel">Menghubungkan ke server...</div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progBar"></div></div>
+    <ul class="step-list">
+      <li id="s1"><div class="step-icon">1</div>Memverifikasi data pengirim misterius</li>
+      <li id="s2"><div class="step-icon">2</div>Membuka enkripsi isi dokumen</li>
+      <li id="s3"><div class="step-icon">3</div>Sinkronisasi kecocokan nama target</li>
+      <li id="s4"><div class="step-icon">4</div>Menyiapkan mental lu yang ampas</li>
+    </ul>
+  </div>
+
+  <div id="step3">
+    <div class="tag reveal">📋 Surat Berhasil Dibuka</div>
+    <h1 class="reveal d1">Nih baca anjing, jangan nangis!</h1>
+    <div class="result-big reveal d2">
+      <div class="result-emoji" id="rEmoji"></div>
+      <div class="result-title" id="rTitle"></div>
+      <div class="result-desc" id="rDesc"></div>
+    </div>
+    <div class="stats-grid reveal d3">
+      <div class="stat-box"><div class="num" id="n1"></div><div class="lbl" id="l1"></div></div>
+      <div class="stat-box"><div class="num" id="n2"></div><div class="lbl" id="l2"></div></div>
+      <div class="stat-box"><div class="num" id="n3"></div><div class="lbl" id="l3"></div></div>
+      <div class="stat-box"><div class="num" id="n4"></div><div class="lbl" id="l4"></div></div>
+    </div>
+    <div class="verdict-box reveal d4" id="verdictBox"></div>
+    <button class="btn btn-purple reveal" onclick="bukaFiturWheel()">Cek Keberuntungan Nasib Lu 🎡</button>
+    <button class="btn btn-primary reveal d5" id="copyLinkBtn" style="margin-top:10px;" onclick="copyLink()">📋 Jebak Temen Lu — Copy Link Ini</button>
+    <button class="btn btn-ghost reveal d6" onmouseover="lari(this)" onclick="nolak()">Bohong bangsat, gue protes!</button>
+    <p class="share-note reveal d6">salin link → jebak korban berikutnya 😈</p>
+  </div>
+
+  <div id="stepWheel">
+    <div class="tag reveal">🎡 Roda Takdir</div>
+    <h1 class="reveal d1">Putar Keberuntungan Lu</h1>
+    <p class="sub reveal d2">Sistem bakal nge-gacha nasib atau kutukan apa yang bakal nemenin sisa hidup lu yang menyedihkan ini.</p>
+
+    <div class="wheel-scene reveal d3">
+      <div class="wheel-outer-ring">
+        <div class="wheel-pointer-wrap"><div class="wheel-ptr-body"></div></div>
+        <div class="wheel-inner">
+          <canvas id="wheelCanvas" width="268" height="268"></canvas>
+        </div>
+        <div class="wheel-center-cap" id="wheelCenterCap">🎰</div>
+      </div>
+    </div>
+
+    <div class="wheel-result" id="wheelResultId">
+      <span class="wheel-result-icon" id="wheelResultIcon"></span>
+      <span class="wheel-result-text" id="wheelResultText"></span>
+    </div>
+
+    <button class="btn btn-primary reveal d4" id="spinBtn" onclick="putarRoda()">Putar Roda Sekarang 🎰</button>
+    <button class="btn btn-ghost reveal d5" style="margin-top:10px;" onclick="balik()">Kembali Lihat Surat 📄</button>
+  </div>
+
+  <div id="stepAngry">
+    <span class="big-emoji reveal">🙄</span>
+    <h1 class="reveal d1" id="angryTitle"></h1>
+    <div class="roast-line reveal d2" id="angryLine"></div>
+    <p class="sub reveal d3" id="angryBody"></p>
+    <button class="btn btn-red reveal d4" onclick="balik()">Oke oke babi, emang fakta nyatanya gitu 😭</button>
+  </div>
+
+</div>
+
+<script>
+let namaUser = "Ngab";
+let merkHP = "HP Android/iPhone Lu";
+
+let cachedResult = null;
+let cachedCupu = null;
+let cachedAngry = null;
+let wheelSpun = false;
+
+function deteksiHPAsli() {
+  const ua = navigator.userAgent;
+  if (/iPhone/i.test(ua)) return "iPhone";
+  if (/iPad/i.test(ua)) return "iPad";
+  if (/Samsung/i.test(ua) || /SAMSUNG/i.test(ua)) return "Samsung";
+  if (/Xiaomi/i.test(ua) || /Redmi/i.test(ua) || /POCO/i.test(ua)) return "Xiaomi/POCO";
+  if (/Oppo/i.test(ua) || /OPPO/i.test(ua)) return "OPPO";
+  if (/Vivo/i.test(ua) || /VIVO/i.test(ua)) return "Vivo";
+  if (/Realme/i.test(ua) || /realme/i.test(ua)) return "Realme";
+  if (/Infinix/i.test(ua)) return "Infinix";
+  if (/Asus/i.test(ua)) return "ASUS";
+  if (/Android/i.test(ua)) return "Android Device";
+  if (/Macintosh/i.test(ua)) return "MacBook";
+  if (/Windows/i.test(ua)) return "Laptop Windows";
+  return "HP Lu";
+}
+
+merkHP = deteksiHPAsli();
+
+const CUPU = [
+  {
+    title: 'Cupu bener dah lu babi 💀',
+    line: 'Gitu aja takut anjing, pantesan jomblo lu karatan wkwkwk',
+    body: 'Baru dikasih link surat ginian udah gemeteran ngentot. Gebetan lu lepas aja lu diem pasrah, sekarang link beginian lu hindarin. Gas klik lah bangsat, ga bakal bikin isi rekening lu abis.'
+  },
+  {
+    title: 'Anjir penakut amat lu bangsat 😭',
+    line: 'Link ginian doang ditakutin, ya pantes gapunya pacar sampe membusuk!',
+    body: 'Ini bukan link pinjol ilegal atau tagihan ukt kuliah lu nyet, gausah lebay. Atau jangan-jangan lu sebenernya emang udah tau spek lu tragis makanya takut ngadepin kenyataan? 👀'
+  }
+];
+
+const DATA = [
+  {
+    emoji:'😔', title:'DIAGNOSA: JOMBLO MATI RASA (STADIUM AKHIR)',
+    desc:'Kondisi lu udah lewat batas tolol. Dokter cinta aja angkat tangan ngeliat lu.',
+    verdict: () => `Kata temen lu yang ngirim link ini: <b>Galeri hp lu penuh screenshot story doi, tapi di-chat duluan aja kagak berani, anjing. Pengecut bener lu, ${namaUser}. Seriuuus, badut lu ngentot!</b> 😂`,
+    stats:[{n:'9',l:'Turunan silsilah jomblo tanpa ada hilal baik'},{n:'1%',l:'Kemungkinan manusia yang khilaf naksir lu'},{n:'88',l:'Chat wa yang cuma lu read doang babi'},{n:'0',l:'Orang yang beneran nyariin lu pas ilang'}]
+  },
+  {
+    emoji:'🥀', title:'STATUS: SINGLELELE KRONIS BIN AMPAS',
+    desc:'Kasur kamar lu lebih tau penderitaan lu dibanding siapapun. Tiap malem cuma melongolin plafon meratapi nasib.',
+    verdict: () => `<b>Doi udah boncengan, bahkan mungkin udah cipokan ama orang lain berbulan-bulan, lu masih aja nunggu "waktu yang tepat" di hp ${merkHP} lu yang butut itu. Nyari waktu yang tepat apaan bangsat, ${namaUser}??? Nunggu dunia kiamat???</b> 😭`,
+    stats:[{n:'12',l:'Video galau tiktok yang lu tonton semalem'},{n:'100%',l:'Kadar ke-badutan lu di depan umum'},{n:'4',l:'Temen tongkrongan yang udah ena-ena'},{n:'0',l:'Yang mau diajak netflix n chill ama lu'}]
+  },
+  {
+    emoji:'💀', title:'REKOR JOMBLO LEGENDARIS PALING BANGSAT',
+    desc:'Langka banget ada spek manusia purba yang bisa bertahan selama ini sendirian tanpa asupan kasih sayang.',
+    verdict: () => `Faktanya: <b>Chat terakhir yang masuk ke WA lu tuh cuma dari grup kelas ato admin slot judi. Bukan dari manusia yang beneran sayang ama lu, babi. HP ${merkHP} lu sepi amat kayak kuburan massal, ${namaUser}.</b> 😂`,
+    stats:[{n:'5x',l:'Lebih sering stalking dari pada dichat orang'},{n:'0',l:'Nyawa yang peduli lu masih idup apa kaga'},{n:'7',l:'Dukun yang gagal nyembuhin aura jomblo'},{n:'ZONK',l:'Hasil asmara lu tetep ampas ngentot'}]
+  }
+];
+
+const ANGRY = [
+  {
+    title: 'Lah, ngapa jadi lu yang ngamuk babi???',
+    line: 'Bacot bener, jomblo akut masih sempet-sempetnya protes bangsat 💀',
+    body: () => `Data sistem kagak pernah bohong ngab. Yang bohong tuh lu sendiri, ${namaUser}, yang tiap malem ngetik "wkwk gpp santai" di hp ${merkHP} lu padahal air mata lu ngalir deras babi. Terima aja nasib!`
+  },
+  {
+    title: 'Serius lu mau ngajak ribut?',
+    line: 'Yaelah, spek rengginang masih aja ngeyel dibilangin wkwkwk',
+    body: () => `Oke lu kagak setuju, ${namaUser}. Tapi coba jawab jujur anjing: kapan terakhir kali ada lawan jenis yang chat lu duluan tanpa ada maunya? Sekali chat cuma minjem duit kan? Miris ngentot.`
+  }
+];
+
+// Data Segmen Roda (6 segmen, masing-masing 60°)
+const WHEEL_SEGMENTS = [
+  { emoji: '🎉', label: 'JOMBLO\nPERMANEN', color: '#ff6b6b', result: '🎉 SELAMAT! Takdir lu udah dikunci: Jomblo Permanen sampai GTA 7 Rilis!' },
+  { emoji: '🔮', label: 'DICHAT\nDOI', color: '#ffa94d', result: '🔮 RAMALAN: Besok dichat doi... tapi cuma mau minjem duit seratus!' },
+  { emoji: '💔', label: 'BONCENGAN\nSAMA ORANG', color: '#4dabf7', result: '💔 RISK WARNING: Besok bakal ngeliat doi boncengan sama cowok knalpot brong.' },
+  { emoji: '☠️', label: 'HP SEPI\n7 TURUNAN', color: '#a855f7', result: '☠️ KUTUKAN: HP sepi 7 turunan. Chat masuk cuma dari provider doang.' },
+  { emoji: '🤡', label: 'SPEK\nBADUT', color: '#2ecc71', result: '🤡 SPEK BADUT: Tetep setia nemenin doi curhat pas lagi berantem ama pacarnya!' },
+  { emoji: '💸', label: 'PAKET\nLENGKAP', color: '#e74c3c', result: '💸 FINANSIAL: Udah jomblo, kere, kuota abis, hp retak. Paket lengkap nyet!' },
+];
+
+const WHEEL_PRIZES = WHEEL_SEGMENTS.map(s => s.result); // backward compat
+
+// Gambar canvas wheel
+function drawWheel(rotationDeg) {
+  const canvas = document.getElementById('wheelCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const r = cx - 2;
+  const segCount = WHEEL_SEGMENTS.length;
+  const segAngle = (2 * Math.PI) / segCount;
+  const rotRad = (rotationDeg * Math.PI) / 180;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  WHEEL_SEGMENTS.forEach((seg, i) => {
+    const startAngle = rotRad + i * segAngle;
+    const endAngle = startAngle + segAngle;
+    const midAngle = startAngle + segAngle / 2;
+
+    // Gambar segmen
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = seg.color;
+    ctx.fill();
+
+    // Border tipis tiap segmen
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Gradien overlay per segmen (efek dimensional)
+    const grad = ctx.createRadialGradient(cx, cy, r * 0.3, cx, cy, r);
+    grad.addColorStop(0, 'rgba(255,255,255,0.15)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.08)');
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Emoji — diletakkan di r*0.30 dari tengah
+    ctx.save();
+    ctx.translate(
+      cx + Math.cos(midAngle) * r * 0.30,
+      cy + Math.sin(midAngle) * r * 0.30
+    );
+    ctx.font = '20px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(seg.emoji, 0, 0);
+    ctx.restore();
+
+    // Text label — di r*0.68, diputar 90° dari radial supaya terbaca sepanjang arc
+    const lines = seg.label.split('\n');
+    ctx.save();
+    ctx.translate(
+      cx + Math.cos(midAngle) * r * 0.68,
+      cy + Math.sin(midAngle) * r * 0.68
+    );
+    // midAngle + PI/2 agar teks tegak lurus radius (terbaca searah arc)
+    let textAngle = midAngle + Math.PI / 2;
+    // Flip teks supaya tidak terbalik di sisi kiri roda
+    if (midAngle > Math.PI / 2 && midAngle < 3 * Math.PI / 2) {
+      textAngle += Math.PI;
+    }
+    ctx.rotate(textAngle);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.font = 'bold 9px "Plus Jakarta Sans", sans-serif';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 3;
+    const lineH = 11;
+    const startY = -((lines.length - 1) * lineH) / 2;
+    lines.forEach((line, li) => {
+      ctx.fillText(line, 0, startY + li * lineH);
+    });
+    ctx.restore();
+  });
+}
+
+let wheelCurrentDeg = 0;
+let wheelAnimId = null;
+
+function mainkanAudio() {
+  const audio = document.getElementById('backsoundPrank');
+  audio.play().catch(e => console.log("Audio play diblokir browser."));
+}
+
+function show(id) {
+  ['step1','step2','step3','stepAngry','stepCupu','stepWheel'].forEach(s => {
+    document.getElementById(s).style.display = 'none';
+  });
+  document.getElementById(id).style.display = 'block';
+
+  // Reset posisi tombol lari biar balik ke tempat semula pas ganti halaman
+  document.querySelectorAll('[onmouseover^="lari"]').forEach(b => {
+    b.style.transform = '';
+  });
+
+  // Render canvas wheel setiap kali halaman wheel dibuka
+  if (id === 'stepWheel') {
+    setTimeout(() => drawWheel(wheelCurrentDeg), 60);
+  }
+}
+
+function cupu() {
+  if (!cachedCupu) {
+    cachedCupu = CUPU[Math.floor(Math.random()*CUPU.length)];
+  }
+  document.getElementById('cupuTitle').textContent = cachedCupu.title;
+  document.getElementById('cupuLine').textContent = cachedCupu.line;
+  document.getElementById('cupuBody').textContent = cachedCupu.body;
+  show('stepCupu');
+}
+
+function validasiMulai() {
+  const inputNama = document.getElementById('username').value.trim();
+  
+  if(inputNama === "" || inputNama.length < 1) {
+    const popup = document.getElementById('customAlert');
+    popup.style.display = 'flex';
+    return;
+  }
+  
+  namaUser = inputNama; 
+  mainkanAudio();
+  show('step2'); 
+  runLoader(); 
+}
+
+function mulai() { 
+  const inputNama = document.getElementById('username').value.trim();
+  if(inputNama === "") {
+    const popup = document.getElementById('customAlert');
+    popup.style.display = 'flex';
+    show('step1');
+    return;
+  }
+  show('step2'); 
+  runLoader(); 
+}
+
+function tutupPopup() {
+  document.getElementById('customAlert').style.display = 'none';
+  document.getElementById('username').focus();
+}
+
+function runLoader() {
+  document.getElementById('loaderTitle').textContent = `Mendownload lampiran surat rahasia...`;
+  
+  const steps = ['s1','s2','s3','s4'];
+  const labels = [
+    `Membaca data manifestasi teks buat ${namaUser}...`,
+    `Memproses file curhatan di internal ${merkHP}...`,
+    `Menghitung total dosa ke-badutan lu...`,
+    `Menyusun kalimat pembantaian mental...`
+  ];
+  
+  const bar = document.getElementById('progBar');
+  const lbl = document.getElementById('progLabel');
+  let i = 0;
+  
+  steps.forEach(s => document.getElementById(s).className = '');
+  bar.style.transition = 'none'; bar.style.width = '0%';
+  setTimeout(() => { bar.style.transition = 'width .5s ease'; }, 50);
+
+  function next() {
+    if (i > 0) document.getElementById(steps[i-1]).className = 'done';
+    if (i < steps.length) {
+      document.getElementById(steps[i]).className = 'active';
+      lbl.textContent = labels[i];
+      bar.style.width = ((i+1)/steps.length*85)+'%';
+      i++;
+      setTimeout(next, 800 + Math.random()*600); 
+    } else {
+      bar.style.width = '100%';
+      lbl.textContent = '✓ Surat Berhasil Didekripsi!';
+      setTimeout(showResult, 700);
+    }
+  }
+  next();
+}
+
+function showResult() {
+  if (!cachedResult) {
+    cachedResult = DATA[Math.floor(Math.random()*DATA.length)];
+  }
+
+  document.getElementById('rEmoji').textContent = cachedResult.emoji;
+  document.getElementById('rTitle').textContent = cachedResult.title;
+  document.getElementById('rDesc').textContent = cachedResult.desc;
+  document.getElementById('verdictBox').innerHTML = cachedResult.verdict();
+
+  // Set label dulu, angka akan dianimasikan
+  cachedResult.stats.forEach((s, i) => {
+    document.getElementById('l' + (i + 1)).innerHTML = s.l;
+    document.getElementById('n' + (i + 1)).textContent = '0';
+  });
+
+  show('step3');
+
+  // Confetti explosion pas hasil muncul
+  setTimeout(() => {
+    if (typeof confetti !== 'undefined') {
+      confetti({
+        particleCount: 150,
+        spread: 90,
+        startVelocity: 40,
+        origin: { y: 0.3 },
+        colors: ['#ff6b6b', '#ffa94d', '#ffd43b', '#a855f7', '#4dabf7', '#2ecc71', '#ff6b6b']
+      });
+      // Salvo kedua 400ms kemudian dari sisi
+      setTimeout(() => {
+        confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff6b6b','#ffd43b','#a855f7'] });
+        confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#4dabf7','#2ecc71','#ffa94d'] });
+      }, 400);
+    }
+  }, 350);
+
+  // Count-up animasi angka statistik
+  setTimeout(() => animateStats(cachedResult.stats), 550);
+}
+
+function bukaFiturWheel() {
+  show('stepWheel');
+}
+
+function putarRoda() {
+  if (wheelSpun) {
+    alert("Lu udah putar roda nasib lu hari ini. Terima aja takdir ampas lu, ga usah maruk!");
+    return;
+  }
+
+  wheelSpun = true;
+  const btn = document.getElementById('spinBtn');
+  const resultDiv = document.getElementById('wheelResultId');
+  const cap = document.getElementById('wheelCenterCap');
+
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  btn.textContent = 'Memutar Takdir... 🌀';
+  if (cap) cap.textContent = '🌀';
+
+  // Total putaran: 5–7 kali + sudut random
+  const extraSpins = (5 + Math.floor(Math.random() * 3)) * 360;
+  const stopDeg = Math.floor(Math.random() * 360);
+  const totalDeg = wheelCurrentDeg + extraSpins + stopDeg;
+
+  const duration = 4000; // ms
+  const startTime = performance.now();
+  const startDeg = wheelCurrentDeg;
+
+  function easeOut(t) {
+    return 1 - Math.pow(1 - t, 4);
+  }
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed / duration, 1);
+    wheelCurrentDeg = startDeg + (totalDeg - startDeg) * easeOut(t);
+    drawWheel(wheelCurrentDeg);
+
+    if (t < 1) {
+      wheelAnimId = requestAnimationFrame(animate);
+    } else {
+      wheelCurrentDeg = totalDeg % 360;
+      drawWheel(wheelCurrentDeg);
+
+      // Pointer ada di 270° (12 o'clock di canvas: 0°=kanan, clockwise)
+      // Cari segmen mana yang jatuh tepat di bawah pointer saat roda berhenti
+      const normalizedDeg = (270 - (wheelCurrentDeg % 360) + 360) % 360;
+      const prizeIndex = Math.floor(normalizedDeg / 60) % 6;
+      const prize = WHEEL_SEGMENTS[prizeIndex];
+
+      document.getElementById('wheelResultIcon').textContent = prize.emoji;
+      document.getElementById('wheelResultText').textContent = prize.result;
+      resultDiv.style.display = 'block';
+      if (cap) cap.textContent = '🔒';
+      btn.textContent = 'Takdir Telah Dikunci 🔒';
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+function nolak() {
+  if (!cachedAngry) {
+    cachedAngry = ANGRY[Math.floor(Math.random()*ANGRY.length)];
+  }
+  document.getElementById('angryTitle').textContent = cachedAngry.title;
+  document.getElementById('angryLine').textContent = cachedAngry.line;
+  document.getElementById('angryBody').textContent = cachedAngry.body(); 
+  show('stepAngry');
+}
+
+function balik() { showResult(); }
+
+function lari(btn) {
+  const maxX = 120; // Seberapa jauh max geser horizontal
+  const maxY = 120; // Seberapa jauh max geser vertikal
+  const x = Math.floor(Math.random() * (maxX * 2)) - maxX;
+  const y = Math.floor(Math.random() * (maxY * 2)) - maxY;
+  
+  btn.style.transform = `translate(${x}px, ${y}px)`;
+  btn.style.transition = 'transform 0.15s ease-out';
+}
+
+function kirimLagi() {
+  cachedResult = null;
+  cachedCupu = null;
+  cachedAngry = null;
+  wheelSpun = false;
+  wheelCurrentDeg = 0;
+
+  const btn = document.getElementById('spinBtn');
+  const resultDiv = document.getElementById('wheelResultId');
+  const cap = document.getElementById('wheelCenterCap');
+
+  // Reset canvas roda secara instan
+  drawWheel(0);
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  btn.textContent = 'Putar Roda Sekarang 🎰';
+  if (cap) cap.textContent = '🎰';
+  resultDiv.style.display = 'none';
+
+  // Reset tombol copy link
+  const copyBtn = document.getElementById('copyLinkBtn');
+  if (copyBtn) copyBtn.textContent = '📋 Jebak Temen Lu — Copy Link Ini';
+
+  document.getElementById('username').value = '';
+  show('step1');
+}
+
+// ===== Fitur Copy Link + Toast =====
+function copyLink() {
+  const url = window.location.href;
+  const btn = document.getElementById('copyLinkBtn');
+
+  const doToast = () => {
+    showToast('✅ Link di-copy! Kirim ke korban berikutnya ya 😈');
+    if (btn) {
+      btn.textContent = '✅ Link Berhasil Di-copy!';
+      setTimeout(() => { btn.textContent = '📋 Jebak Temen Lu — Copy Link Ini'; }, 3000);
+    }
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(doToast).catch(() => fallbackCopy(url, doToast));
+  } else {
+    fallbackCopy(url, doToast);
+  }
+}
+
+function fallbackCopy(text, cb) {
+  const el = document.createElement('textarea');
+  el.value = text;
+  el.style.position = 'fixed';
+  el.style.opacity = '0';
+  document.body.appendChild(el);
+  el.select();
+  try { document.execCommand('copy'); cb(); } catch(e) {}
+  document.body.removeChild(el);
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toastEl');
+  const span = document.getElementById('toastMsg');
+  if (!toast) return;
+  span.textContent = msg;
+  toast.classList.add('toast-show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.remove('toast-show'), 3500);
+}
+
+// ===== Count-Up Animasi Statistik =====
+function animateStats(stats) {
+  stats.forEach((s, i) => {
+    const el = document.getElementById('n' + (i + 1));
+    const raw = String(s.n);
+    // Cek apakah ada angka yang bisa dianimasikan
+    const match = raw.match(/^(\d+)(.*)$/);
+    if (match) {
+      const target = parseInt(match[1]);
+      const suffix = match[2]; // '%', 'x', dll
+      const duration = 1400;
+      const start = performance.now();
+      function tick(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(target * ease) + suffix;
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    } else {
+      // Teks non-numerik (misal "ZONK") — langsung kasih efek flicker
+      el.textContent = '...';
+      setTimeout(() => { el.textContent = raw; }, 800);
+    }
+  });
+}
+
+show('step1');
+// Render roda di awal biar langsung ada gambarnya
+drawWheel(0);
+</script>
+
+<!-- Toast Notification -->
+<div id="toastEl"><span id="toastMsg"></span></div>
+
+</body>
+</html>
